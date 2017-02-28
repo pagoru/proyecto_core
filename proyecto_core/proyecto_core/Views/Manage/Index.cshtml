@@ -1,0 +1,23 @@
+﻿@model IndexViewModel
+@{
+    ViewData["Title"] = "Manage your account";
+}
+
+<h2>@ViewData["Title"].</h2>
+<p class="text-success">@ViewData["StatusMessage"]</p>
+
+<div>
+    <h4>Change your account settings</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Correo electrónico:</dt>
+        <dd>
+            @Model.ApplicationUser.Email <a asp-controller="Manage" asp-action="ChangeEmail" class="btn-bracketed">Cambiar</a>
+        </dd>
+        <dt>Contraseña:</dt>
+        <dd>
+            ******** <a asp-controller="Manage" asp-action="ChangePassword" class="btn-bracketed">Cambiar</a>
+        </dd>
+
+    </dl>
+</div>
