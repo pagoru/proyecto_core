@@ -6,5 +6,16 @@ namespace proyecto_core.Models
     public class ApplicationUser : IdentityUser
     {
         public string Name { get; set; }
+
+        public string getUsernameTodisplay()
+        {
+            if (Name == null)
+                return "@" + UserName;
+
+            if(Name.Length == 0)
+                return "@" + UserName;
+
+            return Name;
+        }
     }
 }

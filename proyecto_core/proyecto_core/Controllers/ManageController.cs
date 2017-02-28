@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using proyecto_core.Models;
 using proyecto_core.Models.ManageViewModels;
 using proyecto_core.Services;
+using proyecto_core.Data;
 
 namespace proyecto_core.Controllers
 {
@@ -61,6 +62,49 @@ namespace proyecto_core.Controllers
         }
 
         //
+        // GET: /Manage/ChangeName
+        [HttpGet]
+        public async Task<IActionResult> ChangeName()
+        {
+            var user = await GetCurrentUserAsync();
+            var model = new ChangeNameViewModel
+            {
+                ApplicationUser = user
+            };
+            return View(model);
+        }
+
+        // 
+        // POST: /Manage/ChangeName
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeName(ChangeNameViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await GetCurrentUserAsync();
+            model.ApplicationUser = user;
+
+            if (user != null)
+            {
+                user.Name = model.NewName;
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    _logger.LogInformation(3, "El usuario ha cambiado con éxito su nombre.");
+                    return RedirectToAction(nameof(Index), new { Message = ManageMessageId.ChangeNameSuccess});
+                }
+                AddErrors(result);
+                return View(model);
+            }
+            return RedirectToAction(nameof(Index), new { Message = ManageMessageId.Error });
+        }
+
+        //
         // GET: /Manage/ChangeEmail
         [HttpGet]
         public async Task<IActionResult> ChangeEmail()
@@ -74,7 +118,7 @@ namespace proyecto_core.Controllers
         }
 
         //
-        // POSt: /Manage/ChangeEmail
+        // POST: /Manage/ChangeEmail
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangeEmail(ChangeEmailViewModel model)
@@ -161,6 +205,7 @@ namespace proyecto_core.Controllers
             AddLoginSuccess,
             ChangePasswordSuccess,
             ChangeEmailSuccess,
+            ChangeNameSuccess,
             Error
         }
 

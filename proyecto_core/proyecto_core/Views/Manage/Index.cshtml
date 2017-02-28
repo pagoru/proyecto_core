@@ -1,15 +1,24 @@
 ﻿@model IndexViewModel
 @{
-    ViewData["Title"] = "Manage your account";
+    ViewData["Title"] = "Ajustes de la cuenta";
+    var arr = "@";
 }
 
 <h2>@ViewData["Title"].</h2>
 <p class="text-success">@ViewData["StatusMessage"]</p>
 
 <div>
-    <h4>Change your account settings</h4>
+    <h4>Cambiar ajustes de la cuenta</h4>
     <hr />
     <dl class="dl-horizontal">
+        <dt>Nombre</dt>
+        <dd>
+            @Model.ApplicationUser.Name <a asp-controller="Manage" asp-action="ChangeName" class="btn-bracketed">Cambiar</a>
+        </dd>
+        <dt>Nombre de usuario</dt>
+        <dd>
+            @arr@Model.ApplicationUser.UserName
+        </dd>
         <dt>Correo electrónico:</dt>
         <dd>
             @Model.ApplicationUser.Email <a asp-controller="Manage" asp-action="ChangeEmail" class="btn-bracketed">Cambiar</a>

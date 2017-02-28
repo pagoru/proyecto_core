@@ -1,0 +1,28 @@
+@model ChangeNameViewModel
+@{
+    ViewData["Title"] = "Cambiar nombre";
+}
+
+<h2>@ViewData["Title"].</h2>
+
+<form asp-controller="Manage" asp-action="ChangeName" method="post" class="form-horizontal">
+    <h4>formulario para cambiar el nombre</h4>
+    <hr />
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="NewName" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="NewName" class="form-control" value="@Model.ApplicationUser.Name" />
+            <span asp-validation-for="NewName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="submit" class="btn btn-default">Cambiar nombre</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
