@@ -124,7 +124,7 @@ namespace proyecto_core.Controllers
                 var user = new ApplicationUser {
                     UserName = model.UserName,
                     Email = model.Email,
-                    Name = (model.Name.Length == 0) ? model.UserName : model.Name
+                    Name = model.Name == null ? "" : model.Name
                 };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)

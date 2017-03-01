@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace proyecto_core.Data.Migrations
+namespace proyecto_core.Migrations
 {
-    public partial class CreateIdentitySchema : Migration
+    public partial class migration1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -50,6 +48,7 @@ namespace proyecto_core.Data.Migrations
                     EmailConfirmed = table.Column<bool>(nullable: false),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
                     NormalizedEmail = table.Column<string>(maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(maxLength: 256, nullable: true),
                     PasswordHash = table.Column<string>(nullable: true),
@@ -153,7 +152,8 @@ namespace proyecto_core.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
-                column: "NormalizedName");
+                column: "NormalizedName",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -174,11 +174,6 @@ namespace proyecto_core.Data.Migrations
                 name: "IX_AspNetUserRoles_RoleId",
                 table: "AspNetUserRoles",
                 column: "RoleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserRoles_UserId",
-                table: "AspNetUserRoles",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",

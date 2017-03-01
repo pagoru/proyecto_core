@@ -7,13 +7,14 @@ namespace proyecto_core.Models
     {
         public string Name { get; set; }
 
-        public string getUsernameTodisplay()
+        public string getUserNameToDisplay()
         {
+            var at_username = $"@{UserName}";
             if (Name == null)
-                return "@" + UserName;
+                return at_username;
 
             if(Name.Length == 0)
-                return "@" + UserName;
+                return at_username;
 
             return Name;
         }
