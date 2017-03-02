@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using proyecto_core.Models;
+using proyecto_core.Models.ContentViewModels;
 
 namespace proyecto_core.Data
 {
@@ -22,5 +23,7 @@ namespace proyecto_core.Data
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
         }
+
+        public DbSet<CreateViewModel> Content { get; set; }
     }
 }

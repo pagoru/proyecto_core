@@ -131,7 +131,7 @@ namespace proyecto_core.Controllers
             var user = await GetCurrentUserAsync();
             model.ApplicationUser = user;
 
-            //Verificación de que el correo electrónico esta en uso y su error correspondiente
+            //Verificación conforme el correo electrónico esta en uso y su error correspondiente
             if (await IsEmailInUse(model.NewEmail))
             {
                 AddErrors(getEmailInUseResult());
