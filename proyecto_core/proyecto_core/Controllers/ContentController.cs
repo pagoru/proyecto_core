@@ -47,7 +47,7 @@ namespace proyecto_core.Controllers
         }
 
         // GET: Content/Create
-        [Authorize]
+        // [Authorize]
         public ActionResult Create()
         {
             return View();
@@ -72,6 +72,7 @@ namespace proyecto_core.Controllers
             catch
             {
                 // Error
+                AddError("El correo electrónico ya esta en uso.");
                 return View(model);
             }
 
@@ -79,6 +80,7 @@ namespace proyecto_core.Controllers
             if(audioDescriptionText.Length < 50)
             {
                 // Error
+                AddError("El archivo contiene muy poco contenido.");
                 return View(model);
             }
             model.AudioDescription = audioDescriptionText;
@@ -90,6 +92,8 @@ namespace proyecto_core.Controllers
 
             // Añade el contenido nuevo
             _context.Content.Add(model);
+            _context.SaveChanges();
+            // Redirige a la página del contenido
             return RedirectToAction($"Details/{model.Guid}");
         }
 
@@ -144,10 +148,29 @@ namespace proyecto_core.Controllers
         }
 
         #region utils
+
         private Task<ApplicationUser> GetCurrentUserAsync()
         {
             return _userManager.GetUserAsync(HttpContext.User);
         }
+
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+        }
+
+        private void AddError(String description)
+        {
+            AddErrors(IdentityResult.Failed(new IdentityError[] {
+                    new IdentityError() {
+                        Description = description
+                    }
+            }));
+        }
+
         #endregion
     }
 }

@@ -19,10 +19,10 @@ namespace proyecto_core.Models.ContentViewModels
         public string UserId{ get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; }
 
-        //[Required]
+        [Required]
         public string Title { get; set; }
 
-        //[Required]
+        [Required]
         public string Description { get; set; }
 
         [Required]
