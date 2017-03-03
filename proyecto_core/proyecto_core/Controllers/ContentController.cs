@@ -33,14 +33,20 @@ namespace proyecto_core.Controllers
             return View();
         }
 
-        // GET: Content/Download/:id
+        // GET: Content/Download/:guid
         [Authorize]
-        public ActionResult Download(int id)
+        public ActionResult Download(Guid guid)
         {
             return View();
         }
 
-        // GET: Content/Details/:id
+        // GET: Content/DownloadDemo/:guid
+        public ActionResult DownloadDemo(Guid guid)
+        {
+            return View();
+        }
+
+        // GET: Content/Details/:guid
         public ActionResult Details(Guid guid)
         {
             return View();
@@ -64,15 +70,36 @@ namespace proyecto_core.Controllers
                 return View(model);
             }
 
+            Stream st = null;
             StreamReader sr = null;
             try
             {
-                sr = new StreamReader(model.File.OpenReadStream());
+                st = model.File.OpenReadStream();
             }
             catch
             {
                 // Error
-                AddError("El correo electrónico ya esta en uso.");
+                AddError("");
+                return View(model);
+            }
+
+            if (IsFileBinary(ReadBytesFromStream(st)))
+            {
+                // Error Non binari
+                AddError("El archivo no tiene un formato valido.");
+                return View(model);
+            }
+
+            // TODO Comprobar que el archivo es de tipo audiodescripción en el interior
+
+            try
+            {
+                sr = new StreamReader(st);
+            }
+            catch
+            {
+                // Error
+                AddError("");
                 return View(model);
             }
 
@@ -169,6 +196,28 @@ namespace proyecto_core.Controllers
                         Description = description
                     }
             }));
+        }
+
+        private bool IsFileBinary(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i++)
+                if (bytes[i] > 127)
+                    return true;
+            return false;
+        }
+
+        public static byte[] ReadBytesFromStream(Stream input)
+        {
+            byte[] buffer = new byte[16 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int read;
+                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    ms.Write(buffer, 0, read);
+                }
+                return ms.ToArray();
+            }
         }
 
         #endregion

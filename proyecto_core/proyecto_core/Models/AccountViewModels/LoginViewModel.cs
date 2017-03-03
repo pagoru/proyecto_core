@@ -8,12 +8,13 @@ namespace proyecto_core.Models.AccountViewModels
 {
     public class LoginViewModel
     {
-        [Required]
         [Display(Name = "Nombre de usuario")]
+        [Required(ErrorMessage = "El campo no puede estar vacio.")]
         public string UserName { get; set; }
 
-        [Required]
+        [Display(Name = "Contraseña")]
         [DataType(DataType.Password)]
+        [Required(ErrorMessage = "El campo no puede estar vacio.")]
         public string Password { get; set; }
 
         [Display(Name = "¿Recordarme?")]

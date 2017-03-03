@@ -8,7 +8,7 @@
 <form asp-controller="Content" asp-action="Create" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal"  enctype="multipart/form-data">
     <h4>Crear nueva audio descripción</h4>
     <hr />
-    <div asp-validation-summary="All" class="text-danger"></div>
+    <!--<div asp-validation-summary="All" class="text-danger"></div>-->
     <div class="form-group">
         <label asp-for="Title" class="col-md-2 control-label"></label>
         <div class="col-md-10">
@@ -24,10 +24,11 @@
         </div>
     </div>
     <div class="form-group">
-    <div class="col-md-10">
-        <p>Selecciona el archivo:</p>
-        <input asp-for="File" type="file"/>
-    </div>
+        <label asp-for="File" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="File" type="file" class="file-select"/>
+            <span asp-validation-for="File" class="text-danger"></span>
+        </div>
     </div>
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
