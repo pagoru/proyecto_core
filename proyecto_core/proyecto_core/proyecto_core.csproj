@@ -34,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\HomeViewModels\" />
+    <Folder Include="Utils\" />
   </ItemGroup>
 
 </Project>

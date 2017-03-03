@@ -31,7 +31,7 @@ namespace proyecto_core.Models.ContentViewModels
         [Required(ErrorMessage = "El campo no puede estar vacio.")]
         [NotMapped]
         // TODO Cambiar por el formato valido
-        [FileExtensions(Extensions = "txt", ErrorMessage ="Este formato no es valido.")]
+        //[FileExtensions(Extensions = "txt", ErrorMessage ="Este formato no es valido.")]
         public IFormFile File { get; set; }
         public string AudioDescription { get; set; }
         
