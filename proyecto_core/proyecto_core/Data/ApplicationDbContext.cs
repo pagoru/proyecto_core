@@ -24,6 +24,6 @@ namespace proyecto_core.Data
             // Add your customizations after calling base.OnModelCreating(builder);
         }
 
-        public DbSet<CreateViewModel> Content { get; set; }
+        public DbSet<ApplicationContent> Content { get; set; }
     }
 }

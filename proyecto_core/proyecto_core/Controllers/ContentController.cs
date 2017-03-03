@@ -40,6 +40,12 @@ namespace proyecto_core.Controllers
             return View();
         }
 
+        // GET: Content/Error
+        public ActionResult Error()
+        {
+            return View();
+        }
+
         // GET: Content/DownloadDemo/:guid
         public ActionResult DownloadDemo(Guid guid)
         {
@@ -49,7 +55,23 @@ namespace proyecto_core.Controllers
         // GET: Content/Details/:guid
         public ActionResult Details(Guid guid)
         {
-            return View();
+            var contentQuery =
+                from _content in _context.Content
+                //where _content.Guid == guid
+                select _content;
+
+            // No encuentra ningun contenido con esa guid
+            /*if(contentQuery.Count<ApplicationContent>() == 0)
+            {
+                return RedirectToAction($"Error");
+            }*/
+
+            var model = new DetailsViewModel()
+            {
+                ApplicationContent = contentQuery.First<ApplicationContent>()
+            };
+
+            return View(model);
         }
 
         // GET: Content/Create
@@ -75,11 +97,12 @@ namespace proyecto_core.Controllers
             try
             {
                 st = model.File.OpenReadStream();
+                sr = new StreamReader(st);
             }
             catch
             {
                 // Error
-                AddError("");
+                AddError("Error");
                 return View(model);
             }
 
@@ -92,36 +115,30 @@ namespace proyecto_core.Controllers
 
             // TODO Comprobar que el archivo es de tipo audiodescripción en el interior
 
-            try
-            {
-                sr = new StreamReader(st);
-            }
-            catch
-            {
-                // Error
-                AddError("");
-                return View(model);
-            }
-
             string audioDescriptionText = sr.ReadToEnd();
-            if(audioDescriptionText.Length < 50)
+            /*if(audioDescriptionText.Length < 50)
             {
                 // Error
                 AddError("El archivo contiene muy poco contenido.");
                 return View(model);
-            }
-            model.AudioDescription = audioDescriptionText;
-
+            }*/
             var user = await GetCurrentUserAsync();
-            model.UserId = user.Id;
 
-            model.Guid = new Guid();
+            var applicationUser = new ApplicationContent()
+            {
+                Guid = new Guid(),
+                UserId = user.Id,
+                Title = model.Title,
+                Description = model.Description,
+                AudioDescription = audioDescriptionText
+
+            };
 
             // Añade el contenido nuevo
-            _context.Content.Add(model);
+            _context.Content.Add(applicationUser);
             _context.SaveChanges();
             // Redirige a la página del contenido
-            return RedirectToAction($"Details/{model.Guid}");
+            return RedirectToAction($"Details/{applicationUser.Guid}");
         }
 
         // GET: Content/Edit/:id
