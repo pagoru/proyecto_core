@@ -4,13 +4,16 @@
     ViewData["Title"] = "Details";
 }
 
-@if (Model != null)
-{
-    <h2>Details</h2>
-
-    <h3>@Model.ApplicationContent.Title</h3>
-    <h3>@Model.ApplicationContent.Description</h3>
-    <h3>@Model.ApplicationContent.AudioDescription</h3>
-}
+<h2>Details</h2>
 
 <div asp-validation-summary="All" class="text-danger"></div>
+
+@if (Model != null)
+{
+    var ac = @Model.ApplicationContent;
+
+    <h3>@ac.Title</h3>
+    <h3>@ac.Description</h3>
+    <a asp-controller="Content" asp-action="Download/@ac.Guid.ToString()" class="btn btn-success">download</a>
+    <a asp-controller="Content" asp-action="DownloadDemo/@ac.Guid.ToString()" class="btn btn-warning">free demo</a>
+}

@@ -6,29 +6,33 @@
 
 <h2>Index</h2>
 
-<table class="table">
-    <caption>Optional table caption.</caption>
-    <thead> 
-        <tr> 
-            <th>Titulo</th> 
-            <th>Descripción</th> 
-            <th></th>
-            <th></th>
-        </tr>
-    </thead> 
-    <tbody>
-        @foreach (ApplicationContent ac in @Model.ApplicationContentList)
-        {
+<div asp-validation-summary="All" class="text-danger"></div>
+
+@if (@Model != null)
+{
+    <table class="table">
+        <caption>Optional table caption.</caption>
+        <thead>
             <tr>
-                <td>@ac.Title</td>
-                <td>@ac.Description</td>
-                <td>
-                    <a asp-controller="Content" asp-action="Download/@ac.Guid.ToString()" class="btn btn-success">download</a>
-                </td>
-                <td>
-                    <a asp-controller="Content" asp-action="DownloadDemo/@ac.Guid.ToString()" class="btn btn-warning">free demo</a>
-                </td>
+                <th>Titulo</th>
+                <th>Descripción</th>
+                <th>Visitas</th>
+                <th>Descargas</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (ApplicationContent ac in @Model.ApplicationContentList)
+            {
+                var totalDownload = @ac.Downloads + @ac.DemoDownloads;
+                <tr>
+                    <td>
+                        <a asp-controller="Content" asp-action="Details/@ac.Guid.ToString()">@ac.Title</a>
+                    </td>
+                    <td>@ac.Description</td>
+                    <td>@ac.Views</td>
+                    <td>@totalDownload</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

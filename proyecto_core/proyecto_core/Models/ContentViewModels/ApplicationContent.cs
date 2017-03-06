@@ -17,9 +17,15 @@ namespace proyecto_core.Models.ContentViewModels
         public ApplicationUser ApplicationUser { get; set; }
 
         public virtual string Title { get; set; }
-
         public virtual string Description { get; set; }
 
         public string AudioDescription { get; set; }
+
+        public string AddedDateTime { get; set; }
+
+        public int Views { get; set; }
+        public int DemoDownloads { get; set; }
+        public int Downloads { get; set; }
+
     }
 }

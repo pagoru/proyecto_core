@@ -30,9 +30,17 @@ namespace proyecto_core.Controllers
         // GET: Content
         public ActionResult Index()
         {
-            var applicationContentList =
-                (from _content in _context.Content
-                select _content).ToList();
+            var resultQuery =
+                from _content in _context.Content
+                select _content;
+
+            if(resultQuery == null)
+            {
+                AddError("No hay contenido");
+                return View();
+            }
+
+            var applicationContentList = resultQuery.ToList();
 
             var model = new IndexViewModel()
             {
@@ -52,16 +60,15 @@ namespace proyecto_core.Controllers
                  select _content).FirstOrDefault();
             //Hacer mas comprobaciones
 
+            // Incrementar las visitas
+            applicationContent.Downloads++;
+            _context.Update(applicationContent);
+            _context.SaveChanges();
+
             var fileName = applicationContent.Title.Replace(' ', '_');
 
             Response.Headers.Add("content-disposition", "attachment; filename=" + fileName + ".txt");
             return GetFileFromText(applicationContent.AudioDescription); // or "application/x-rar-compressed"
-        }
-
-        private FileStreamResult GetFileFromText(String text)
-        {
-            MemoryStream ms = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(text));
-            return File(ms, "application/octet-stream"); // or "application/x-rar-compressed"
         }
 
         // GET: Content/Error
@@ -78,6 +85,11 @@ namespace proyecto_core.Controllers
                  where _content.Guid == Guid.Parse(id)
                  select _content).FirstOrDefault();
             //Hacer mas comprobaciones
+
+            // Incrementar las visitas
+            applicationContent.DemoDownloads++;
+            _context.Update(applicationContent);
+            _context.SaveChanges();
 
             var fileName = applicationContent.Title.Replace(' ', '_');
             var ad = applicationContent.AudioDescription;
@@ -110,6 +122,12 @@ namespace proyecto_core.Controllers
                 AddError("No se ha encontrado el contenido solicitado.");
                 return View();
             }
+
+            // Incrementar las visitas
+            applicationContent.Views++;
+            _context.Update(applicationContent);
+            _context.SaveChanges();
+            
 
             var model = new DetailsViewModel()
             {
@@ -177,7 +195,10 @@ namespace proyecto_core.Controllers
                 UserId = user.Id,
                 Title = model.Title,
                 Description = model.Description,
-                AudioDescription = audioDescriptionText
+                AudioDescription = audioDescriptionText,
+                AddedDateTime = DateTime.Now.ToString(),
+                Views = 0,
+                Downloads = 0
 
             };
 
@@ -268,6 +289,12 @@ namespace proyecto_core.Controllers
                 if (bytes[i] > 127)
                     return true;
             return false;
+        }
+
+        private FileStreamResult GetFileFromText(String text)
+        {
+            MemoryStream ms = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(text));
+            return File(ms, "application/octet-stream"); // or "application/x-rar-compressed"
         }
 
         public static byte[] ReadBytesFromStream(Stream input)
