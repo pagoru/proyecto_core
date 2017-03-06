@@ -30,14 +30,38 @@ namespace proyecto_core.Controllers
         // GET: Content
         public ActionResult Index()
         {
-            return View();
+            var applicationContentList =
+                (from _content in _context.Content
+                select _content).ToList();
+
+            var model = new IndexViewModel()
+            {
+                ApplicationContentList = applicationContentList
+            };
+
+            return View(model);
         }
 
         // GET: Content/Download/:guid
         [Authorize]
-        public ActionResult Download(Guid guid)
+        public FileStreamResult Download(String id)
         {
-            return View();
+            var applicationContent =
+                (from _content in _context.Content
+                 where _content.Guid == Guid.Parse(id)
+                 select _content).FirstOrDefault();
+            //Hacer mas comprobaciones
+
+            var fileName = applicationContent.Title.Replace(' ', '_');
+
+            Response.Headers.Add("content-disposition", "attachment; filename=" + fileName + ".txt");
+            return GetFileFromText(applicationContent.AudioDescription); // or "application/x-rar-compressed"
+        }
+
+        private FileStreamResult GetFileFromText(String text)
+        {
+            MemoryStream ms = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(text));
+            return File(ms, "application/octet-stream"); // or "application/x-rar-compressed"
         }
 
         // GET: Content/Error
@@ -47,28 +71,49 @@ namespace proyecto_core.Controllers
         }
 
         // GET: Content/DownloadDemo/:guid
-        public ActionResult DownloadDemo(Guid guid)
+        public FileStreamResult DownloadDemo(String id)
         {
-            return View();
+            var applicationContent =
+                (from _content in _context.Content
+                 where _content.Guid == Guid.Parse(id)
+                 select _content).FirstOrDefault();
+            //Hacer mas comprobaciones
+
+            var fileName = applicationContent.Title.Replace(' ', '_');
+            var ad = applicationContent.AudioDescription;
+            ad = ad.Substring(0, Math.Min(150, ad.Length)) + "... - Para descargar el contenido completo... PAGA! >:)";
+
+            Response.Headers.Add("content-disposition", "attachment; filename=demo-" + fileName + ".txt");
+            return GetFileFromText(ad); // or "application/x-rar-compressed"
         }
 
         // GET: Content/Details/:guid
-        public ActionResult Details(Guid guid)
+        public ActionResult Details(String id)
         {
-            var contentQuery =
-                from _content in _context.Content
-                //where _content.Guid == guid
-                select _content;
-
-            // No encuentra ningun contenido con esa guid
-            /*if(contentQuery.Count<ApplicationContent>() == 0)
+            Guid guid;
+            try
             {
-                return RedirectToAction($"Error");
-            }*/
+                guid = Guid.Parse(id);
+            } catch
+            {
+                AddError("No existe el contenido solicitado.");
+                return View();
+            }
+
+            var applicationContent = 
+                (from _content in _context.Content
+                where _content.Guid == guid
+                 select _content).FirstOrDefault();
+
+            if (applicationContent == null)
+            {
+                AddError("No se ha encontrado el contenido solicitado.");
+                return View();
+            }
 
             var model = new DetailsViewModel()
             {
-                ApplicationContent = contentQuery.First<ApplicationContent>()
+                ApplicationContent = applicationContent
             };
 
             return View(model);
@@ -93,11 +138,9 @@ namespace proyecto_core.Controllers
             }
 
             Stream st = null;
-            StreamReader sr = null;
             try
             {
                 st = model.File.OpenReadStream();
-                sr = new StreamReader(st);
             }
             catch
             {
@@ -106,16 +149,20 @@ namespace proyecto_core.Controllers
                 return View(model);
             }
 
-            if (IsFileBinary(ReadBytesFromStream(st)))
+            byte[] resultBytes = ReadBytesFromStream(st);
+
+            if (IsFileBinary(resultBytes))
             {
-                // Error Non binari
+                // Error binari file
                 AddError("El archivo no tiene un formato valido.");
                 return View(model);
             }
 
-            // TODO Comprobar que el archivo es de tipo audiodescripción en el interior
+            string audioDescriptionText = System.Text.Encoding.UTF8.GetString(resultBytes);
 
-            string audioDescriptionText = sr.ReadToEnd();
+            // TODO Comprobar que el archivo es de tipo audiodescripción en el interior
+            //Comprobar que no haya un duplicado
+
             /*if(audioDescriptionText.Length < 50)
             {
                 // Error
