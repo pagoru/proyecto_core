@@ -13,7 +13,7 @@
     var ac = @Model.ApplicationContent;
 
     <h3>@ac.Title</h3>
-    <h3>@ac.Description</h3>
-    <a asp-controller="Content" asp-action="Download/@ac.Guid.ToString()" class="btn btn-success">download</a>
-    <a asp-controller="Content" asp-action="DownloadDemo/@ac.Guid.ToString()" class="btn btn-warning">free demo</a>
+    <h4>@ac.Description</h4>
+    <a asp-controller="Content" asp-action="Download/@ac.Guid.ToString()" class="btn btn-success">descargar</a>
+    <a asp-controller="Content" asp-action="DownloadDemo/@ac.Guid.ToString()" class="btn btn-default">demo gratis</a>
 }

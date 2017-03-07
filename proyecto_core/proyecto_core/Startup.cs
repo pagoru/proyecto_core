@@ -12,6 +12,9 @@ using Microsoft.Extensions.Logging;
 using proyecto_core.Data;
 using proyecto_core.Models;
 using proyecto_core.Services;
+using Microsoft.Extensions.WebEncoders;
+using System.Text.Unicode;
+using System.Text.Encodings.Web;
 
 namespace proyecto_core
 {
@@ -39,6 +42,10 @@ namespace proyecto_core
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<WebEncoderOptions>(options =>
+            {
+                options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
+            });
             // Add framework services.
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
