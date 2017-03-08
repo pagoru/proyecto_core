@@ -1,23 +1,23 @@
-@using proyecto_core.Models.ContentViewModels
 @model proyecto_core.Models.ContentViewModels.IndexViewModel
 @{
     ViewData["Title"] = "Index";
 }
 
-<h2>Index</h2>
+<h2>Contenido</h2>
 
 <div asp-validation-summary="All" class="text-danger"></div>
 
 @if (@Model != null)
 {
     <table class="table">
-        <caption>Optional table caption.</caption>
+        <caption>Lista de peliculas y series.</caption>
         <thead>
             <tr>
                 <th>Titulo</th>
                 <th>Descripción</th>
                 <th>Visitas</th>
                 <th>Descargas</th>
+                <th>Fecha de subida</th>
             </tr>
         </thead>
         <tbody>
@@ -31,6 +31,7 @@
                     <td>@ac.Description</td>
                     <td>@ac.Views</td>
                     <td>@totalDownload</td>
+                    <td>@ac.AddedDateTime</td>
                 </tr>
             }
         </tbody>

@@ -44,7 +44,7 @@ namespace proyecto_core
         {
             services.Configure<WebEncoderOptions>(options =>
             {
-                options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
+                options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.LatinExtendedAdditional);
             });
             // Add framework services.
             services.AddDbContext<ApplicationDbContext>(options =>
