@@ -18,16 +18,13 @@ namespace proyecto_core.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
 
         public AdminController(
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager,
-            SignInManager<ApplicationUser> signInManager)
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            _signInManager = signInManager;
         }
 
         public IActionResult Index()
@@ -48,40 +45,49 @@ namespace proyecto_core.Controllers
         {
             if(id == null)
             {
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
 
             }
             if(id.Length == 0)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             var idParts = id.Split('-');
             if(idParts.Length != 2)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             var roleName = idParts[0];
             var userName = idParts[1];
             if (roleName.Length == 0)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             if (userName.Length == 0)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             var user = _userManager.Users.FirstOrDefault(u => u.UserName == userName);
             if(user == null)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             var role = _roleManager.Roles.FirstOrDefault(r => r.Name == roleName);
             if(role == null)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             if (!user.IsInRole(role))
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
 
             await _userManager.RemoveFromRoleAsync(user, roleName);
@@ -94,7 +100,8 @@ namespace proyecto_core.Controllers
         {
             if (!await _roleManager.RoleExistsAsync(id))
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
 
             var role = _roleManager.Roles.First(r => r.Name == id);
@@ -105,6 +112,12 @@ namespace proyecto_core.Controllers
 
         public async Task<IActionResult> AddUserRole(string id)
         {
+            if (!await _roleManager.RoleExistsAsync(id))
+            {
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
+            }
+
             var model = new AddUserRoleViewModel()
             {
                 IdentityRole = GetRole(id),
@@ -118,34 +131,41 @@ namespace proyecto_core.Controllers
         {
             if(model == null)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             if(model.RoleName == null)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             if(model.UserName == null)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             if(model.RoleName.Length == 0)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             if(model.UserName.Length == 0)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             
             if(!await _roleManager.RoleExistsAsync(model.RoleName))
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
 
             var user = GetUser(model.UserName);
             if (user == null)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
 
             await _userManager.AddToRoleAsync(user, model.RoleName);
@@ -159,16 +179,19 @@ namespace proyecto_core.Controllers
         {
             if(model.Name == null)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             if(model.Name.Length == 0)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             
             if(await _roleManager.RoleExistsAsync(model.Name))
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             await _roleManager.CreateAsync(new IdentityRole(model.Name));
 
@@ -180,15 +203,18 @@ namespace proyecto_core.Controllers
         {
             if(id == null)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             if(id.Length == 0)
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             if(!await _roleManager.RoleExistsAsync(id))
             {
-
+                AddError("Error");
+                return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
 
             var model = new DetailsRoleViewModel()
@@ -201,6 +227,23 @@ namespace proyecto_core.Controllers
 
 
         #region utils
+
+        private void AddError(String description)
+        {
+            AddErrors(IdentityResult.Failed(new IdentityError[] {
+                    new IdentityError() {
+                        Description = description
+                    }
+            }));
+        }
+
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+        }
 
         public async Task<IdentityResult> CloseUserSession(string UserName)
         {

@@ -1,15 +1,15 @@
 ﻿@using proyecto_core.Models.AdminViewModels
 @model DetailsRoleViewModel
 @{
-    ViewData["Title"] = $"Rol [{Model.IdentityRole.Name}]";
+    ViewData["Title"] = $"Rol({Model.IdentityRole.Name})";
 }
 <h5>
     <a asp-controller="Admin" asp-action="Index">Admin</a>
     <span>/</span>
-    <span>Rol(@Model.IdentityRole.Name)</span>
+    <span>@ViewData["Title"]</span>
 </h5>
 
-<h2>@Model.IdentityRole.Name (@Model.IdentityRole.Id)</h2>
+<h2>@ViewData["Title"]</h2>
 
 <div asp-validation-summary="All" class="text-danger"></div>
 
