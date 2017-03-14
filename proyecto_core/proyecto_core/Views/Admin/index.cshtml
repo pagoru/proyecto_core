@@ -1,0 +1,42 @@
+﻿@using proyecto_core.Models.AdminViewModels
+@model IndexViewModel
+@{
+    ViewData["Title"] = "Administración";
+}
+<h5>
+    <span>Admin</span>
+    <span>/</span>
+</h5>
+
+<h2>Administración</h2>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+@if (Model != null)
+{
+    <table class="table">
+        <caption>Lista de todos los roles</caption>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>guid</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (IdentityRole ir in Model.IdentityRoleList)
+            {
+                <tr>
+                    <td>
+                        <a asp-controller="Admin" asp-action="DetailsRole/@ir.Name">@ir.Name</a>
+                    </td>
+                    <td>@ir.Id</td>
+                    <td>
+                        <a asp-controller="Admin" asp-action="RemoveRole/@ir.Name" class="btn btn-warning">eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+<a asp-controller="Admin" asp-action="CreateRole" class="btn btn-success">crear</a>

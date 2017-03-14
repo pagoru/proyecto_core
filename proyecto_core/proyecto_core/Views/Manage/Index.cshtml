@@ -1,4 +1,6 @@
-﻿@model IndexViewModel
+﻿@using proyecto_core.Models.ManageViewModels
+@using proyecto_core
+@model IndexViewModel
 @{
     ViewData["Title"] = "Ajustes de la cuenta";
     var arr = "@";
@@ -27,6 +29,8 @@
         <dd>
             ******** <a asp-controller="Manage" asp-action="ChangePassword" class="btn-bracketed">Cambiar</a>
         </dd>
-
     </dl>
+    @if (Model.IsAdmin) {
+        <a asp-controller="Admin" asp-action="Index" class="btn btn-info">Adminsitración</a>
+    }
 </div>

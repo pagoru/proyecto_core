@@ -1,0 +1,38 @@
+﻿@using proyecto_core.Models.AdminViewModels
+@model DetailsRoleViewModel
+@{
+    ViewData["Title"] = $"Rol [{Model.IdentityRole.Name}]";
+}
+<h5>
+    <a asp-controller="Admin" asp-action="Index">Admin</a>
+    <span>/</span>
+    <span>Rol(@Model.IdentityRole.Name)</span>
+</h5>
+
+<h2>@Model.IdentityRole.Name (@Model.IdentityRole.Id)</h2>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<table class="table">
+    <caption>Lista de usuarios con el rol @Model.IdentityRole.Name</caption>
+    <thead>
+        <tr>
+            <th>Nombre de usuario</th>
+            <th>guid</th>
+            <ht></ht>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (ApplicationUser au in Model.ApplicationUserList)
+        {
+            <tr>
+                <td>@@@au.UserName</td>
+                <td>@au.Id</td>
+                <td>
+                    <a  asp-controller="Admin" asp-action="RemoveUserRole/@Model.IdentityRole.Name-@au.UserName" class="btn btn-warning">quitar rol</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a asp-controller="Admin" asp-action="AddUserRole/@Model.IdentityRole.Name" class="btn btn-success">añadir usuario</a>

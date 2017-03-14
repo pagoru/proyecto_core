@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace proyecto_core.Models
 {
-    // Add profile data for application users by adding properties to the ApplicationUser class
     public class ApplicationUser : IdentityUser
     {
         public string Name { get; set; }
@@ -17,6 +18,11 @@ namespace proyecto_core.Models
                 return at_username;
 
             return Name;
+        }
+
+        public bool IsInRole(IdentityRole role)
+        {
+            return Roles.FirstOrDefault(r => r.RoleId == role.Id) != null;
         }
     }
 }

@@ -10,20 +10,25 @@ using System.IO;
 using proyecto_core.Models;
 using Microsoft.AspNetCore.Identity;
 using proyecto_core.Data;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace proyecto_core.Controllers
 {
     public class ContentController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
 
         public ContentController(
             UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager,
             ApplicationDbContext context
             )
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _context = context;
         }
 

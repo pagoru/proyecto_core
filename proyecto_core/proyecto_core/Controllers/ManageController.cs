@@ -9,6 +9,7 @@ using proyecto_core.Models;
 using proyecto_core.Models.ManageViewModels;
 using proyecto_core.Services;
 using proyecto_core.Data;
+using proyecto_core.Consts;
 
 namespace proyecto_core.Controllers
 {
@@ -18,20 +19,17 @@ namespace proyecto_core.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly string _externalCookieScheme;
-        private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
 
         public ManageController(
           UserManager<ApplicationUser> userManager,
           SignInManager<ApplicationUser> signInManager,
           IOptions<IdentityCookieOptions> identityCookieOptions,
-          IEmailSender emailSender,
           ILoggerFactory loggerFactory)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _externalCookieScheme = identityCookieOptions.Value.ExternalCookieAuthenticationScheme;
-            _emailSender = emailSender;
             _logger = loggerFactory.CreateLogger<ManageController>();
         }
 
@@ -54,6 +52,8 @@ namespace proyecto_core.Controllers
             var model = new IndexViewModel
             {
                 ApplicationUser = user,
+
+                IsAdmin = await _userManager.IsInRoleAsync(user, WebRoles.Admin),
                 
                 Logins = await _userManager.GetLoginsAsync(user),
                 BrowserRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user)

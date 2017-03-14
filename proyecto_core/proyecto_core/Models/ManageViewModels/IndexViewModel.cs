@@ -20,5 +20,7 @@ namespace proyecto_core.Models.ManageViewModels
         public bool TwoFactor { get; set; }
 
         public bool BrowserRemembered { get; set; }
+
+        public bool IsAdmin { get; set; }
     }
 }
