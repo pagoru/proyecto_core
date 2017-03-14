@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using proyecto_core.Data;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace proyecto_core.Controllers
 {
@@ -70,10 +71,11 @@ namespace proyecto_core.Controllers
             _context.Update(applicationContent);
             _context.SaveChanges();
 
-            var fileName = applicationContent.Title.Replace(' ', '_');
+            var fileName = DeleteNonAscii(applicationContent.Title.Replace(' ', '-').Replace('_', '-'));
+            var ad = DeleteNonAscii(applicationContent.AudioDescription);
 
             Response.Headers.Add("content-disposition", "attachment; filename=" + fileName + ".txt");
-            return GetFileFromText(applicationContent.AudioDescription); // or "application/x-rar-compressed"
+            return GetFileFromText(ad); // or "application/x-rar-compressed"
         }
 
         // GET: Content/Error
@@ -96,9 +98,10 @@ namespace proyecto_core.Controllers
             _context.Update(applicationContent);
             _context.SaveChanges();
 
-            var fileName = applicationContent.Title.Replace(' ', '_');
+            var fileName = DeleteNonAscii(applicationContent.Title.Replace(' ', '-').Replace('_', '-'));
             var ad = applicationContent.AudioDescription;
-            ad = ad.Substring(0, Math.Min(150, ad.Length)) + "... - Para descargar el contenido completo... PAGA! >:)";
+            ad = DeleteNonAscii(ad.Substring(0, Math.Min(150, ad.Length)) + "... - Para descargar el contenido completo... PAGA! >:)");
+          
 
             Response.Headers.Add("content-disposition", "attachment; filename=demo-" + fileName + ".txt");
             return GetFileFromText(ad); // or "application/x-rar-compressed"
@@ -265,6 +268,11 @@ namespace proyecto_core.Controllers
         }
 
         #region utils
+
+        private string DeleteNonAscii(string text)
+        {
+            return Regex.Replace(text, @"[^\u0000-\u007F]+", string.Empty);
+        }
 
         private Task<ApplicationUser> GetCurrentUserAsync()
         {
