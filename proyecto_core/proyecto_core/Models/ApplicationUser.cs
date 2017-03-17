@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using proyecto_core.Models.ContentViewModels;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,6 +8,10 @@ namespace proyecto_core.Models
     public class ApplicationUser : IdentityUser
     {
         public string Name { get; set; }
+
+        public virtual ICollection<ApplicationContent> ApplicationContentCollection { get; set; }
+
+
 
         public string getUserNameToDisplay()
         {
@@ -24,5 +29,6 @@ namespace proyecto_core.Models
         {
             return Roles.FirstOrDefault(r => r.RoleId == role.Id) != null;
         }
+
     }
 }

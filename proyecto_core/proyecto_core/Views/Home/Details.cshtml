@@ -1,0 +1,25 @@
+@using proyecto_core.Models.ContentViewModels
+@model DetailsViewModel
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Detalles</h2>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+@if (Model != null)
+{
+    var ac = @Model.ApplicationContent;
+
+    <h3>@ac.Title</h3>
+    <h4>@ac.Description</h4>
+    <a asp-controller="Home" asp-action="Download/@ac.Id.ToString()" class="btn btn-success">descargar</a>
+    <a asp-controller="Home" asp-action="DownloadDemo/@ac.Id.ToString()" class="btn btn-default">demo gratis</a>
+    @if (@Model.IsAdmin)
+    {
+        <br />
+        <a asp-controller="Home" asp-action="Edit/@ac.Id.ToString()" class="btn btn-warning">editar</a>
+        <a asp-controller="Home" asp-action="Delete/@ac.Id.ToString()" class="btn btn-danger">eliminar</a>
+    }
+}

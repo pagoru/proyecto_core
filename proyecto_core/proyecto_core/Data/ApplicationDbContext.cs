@@ -22,6 +22,15 @@ namespace proyecto_core.Data
             // Customize the ASP.NET Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
+
+            var au = builder.Entity<ApplicationUser>();
+            //au.HasKey(u => u.Id);
+            au.HasMany(u => u.ApplicationContentCollection)
+                .WithOne(c => c.ApplicationUser);
+
+            /*var ac = builder.Entity<ApplicationContent>();
+            //ac.HasKey(c => c.Id);
+            ac.HasOne(c => c.ApplicationUser);*/
         }
 
         public DbSet<ApplicationContent> Content { get; set; }

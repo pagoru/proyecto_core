@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 
 namespace proyecto_core.Models.ContentViewModels
 {
-    public class IndexViewModel
+    public class DetailsViewModel
     {
-        public List<ApplicationContent> ApplicationContentList { get; set; }
+        public ApplicationContent ApplicationContent { get; set; }
+
+        public bool IsAdmin { get; set; }
     }
 }
