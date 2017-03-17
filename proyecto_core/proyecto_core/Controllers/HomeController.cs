@@ -88,12 +88,6 @@ namespace proyecto_core.Controllers
             return GetFileFromText(ad); // or "application/x-rar-compressed"
         }
 
-        // GET: Content/Error
-        public ActionResult Error()
-        {
-            return View();
-        }
-
         // GET: Content/DownloadDemo/:guid
         public FileStreamResult DownloadDemo(String id)
         {
@@ -236,7 +230,7 @@ namespace proyecto_core.Controllers
 
         // GET: Content/Edit/:id
         [Authorize]
-        public ActionResult Edit(int id)
+        public ActionResult Edit(String id)
         {
             return View();
         }
