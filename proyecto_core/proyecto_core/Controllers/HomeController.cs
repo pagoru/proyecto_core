@@ -35,9 +35,11 @@ namespace proyecto_core.Controllers
             _context = context;
         }
 
-        // GET: Content
+        //
+        // GET: Content/
         public async Task<ActionResult> Index()
         {
+            //Se devuelve una lista con todo el contenido disponible
             var resultQuery =
                 from _content in _context.Content
                 select _content;
@@ -55,6 +57,8 @@ namespace proyecto_core.Controllers
             var user = await GetCurrentUserAsync();
             if(user != null)
             {
+                //Se comprueba si el usuario pertenece a la 
+                //administración para poder mostrar las opciones de edición
                 isAdmin = await _userManager.IsInRoleAsync(user, WebRoles.Admin);
             }
 
@@ -67,54 +71,74 @@ namespace proyecto_core.Controllers
             return View(model);
         }
 
+        //
         // GET: Content/Download/:guid
         [Authorize]
         public FileStreamResult Download(string id)
         {
+            //Devuelve el contenido en función de la id pasada
             var applicationContent =
                 (from _content in _context.Content
                  where _content.Id == Guid.Parse(id)
                  select _content).FirstOrDefault();
-            //Hacer mas comprobaciones
+            //TODO Hacer más comprobaciones
 
-            // Incrementar las visitas
+            //Se incrementa el contado de descargas
             applicationContent.Downloads++;
             _context.Update(applicationContent);
             _context.SaveChanges();
 
+            //Devuelve el titulo del contenido parseado 
+            //de tal forma que se pueda usar como nombre de archivo
             var fileName = DeleteNonAscii(applicationContent.Title.Replace(' ', '-').Replace('_', '-'));
+            //Elimina cualquier carácter que no sea ascii para no provocar 
+            //conflictos a la hora de crear el archivo
             var ad = DeleteNonAscii(applicationContent.AudioDescription);
 
+            //Añade la cabecera al cliente con la información de que es un archivo .txt
             Response.Headers.Add("content-disposition", "attachment; filename=" + fileName + ".txt");
-            return GetFileFromText(ad); // or "application/x-rar-compressed"
+            //Genera y devuelve el archivo desde el texto
+            return GetFileFromText(ad);
         }
 
-        // GET: Content/DownloadDemo/:guid
+        //
+        // GET: Content/DownloadDemo/:id
         public FileStreamResult DownloadDemo(string id)
         {
+            //Devuelve el contenido en función de la id pasada
             var applicationContent =
                 (from _content in _context.Content
                  where _content.Id == Guid.Parse(id)
                  select _content).FirstOrDefault();
-            //Hacer mas comprobaciones
+            //TODO Hacer más comprobaciones
 
-            // Incrementar las visitas
+            //Se incrementa el contado de descargas de demos
             applicationContent.DemoDownloads++;
             _context.Update(applicationContent);
             _context.SaveChanges();
 
+            //Devuelve el titulo del contenido parseado 
+            //de tal forma que se pueda usar como nombre de archivo
             var fileName = DeleteNonAscii(applicationContent.Title.Replace(' ', '-').Replace('_', '-'));
+            //Elimina cualquier carácter que no sea ascii para no provocar 
+            //conflictos a la hora de crear el archivo
             var ad = applicationContent.AudioDescription;
+            //Trunca el contenido para que sea apto para la demo y añadé un mensaje 
+            //informativo y 'poco directo' sobre que realice un pago para descargar
+            //la versión completa
             ad = DeleteNonAscii(ad.Substring(0, Math.Min(150, ad.Length)) + "... - Para descargar el contenido completo... PAGA! >:)");
-          
 
-            Response.Headers.Add("content-disposition", "attachment; filename=demo-" + fileName + ".txt");
-            return GetFileFromText(ad); // or "application/x-rar-compressed"
+            //Añade la cabecera al cliente con la información de que es un archivo .txt
+            Response.Headers.Add("content-disposition", "attachment; filename=" + fileName + ".txt");
+            //Genera y devuelve el archivo desde el texto
+            return GetFileFromText(ad);
         }
 
+        //
         // GET: Content/Details/:guid
         public async Task<ActionResult> Details(string id)
         {
+            //Se parsea la id para comprobar que es una guid valida
             Guid guid;
             try
             {
@@ -125,27 +149,31 @@ namespace proyecto_core.Controllers
                 return View();
             }
 
+            //Devuelve todos los detalles del contenido especificado
             var applicationContent = 
                 (from _content in _context.Content
                 where _content.Id == guid
                  select _content).FirstOrDefault();
 
+            //En caso de que el resultado de la busqueda no sea satisfactoria
             if (applicationContent == null)
             {
                 AddError("No se ha encontrado el contenido solicitado.");
                 return View();
             }
 
-            // Incrementar las visitas
+            //Incrementa el contado de visitas de la página
             applicationContent.Views++;
             _context.Update(applicationContent);
             _context.SaveChanges();
-
+            
             //Comprobar si el usuario es administrador
             var isAdmin = false;
             var user = await GetCurrentUserAsync();
             if (user != null)
             {
+                //Se comprueba si el usuario pertenece a la 
+                //administración para poder mostrar las opciones de edición
                 isAdmin = await _userManager.IsInRoleAsync(user, WebRoles.Admin);
             }
 
@@ -158,13 +186,16 @@ namespace proyecto_core.Controllers
             return View(model);
         }
 
+        //
         // GET: Content/Create
         // [Authorize]
+        //TODO Autorizar solo a los usuarios que puedan publicar contenido en la web
         public ActionResult Create()
         {
             return View();
         }
 
+        //
         // POST: Content/Create
         [Authorize]
         [HttpPost]
@@ -176,6 +207,7 @@ namespace proyecto_core.Controllers
                 return View(model);
             }
 
+            //Se abre un stream para leer el archivo.
             Stream st = null;
             try
             {
@@ -188,19 +220,21 @@ namespace proyecto_core.Controllers
                 return View(model);
             }
 
+            //Se leen los bytes del stream
             byte[] resultBytes = ReadBytesFromStream(st);
-
+            //Se comprueban si estos bytes contienen una cabecera valida
+            //y por lo tanto, que es un archivo de texto
+            //En caso de que el archivo sea un binario, dará un error
             if (IsFileBinary(resultBytes))
             {
-                // Error binari file
                 AddError("El archivo no tiene un formato valido.");
                 return View(model);
             }
-
+            //Los bytes se convierten a texto
             string audioDescriptionText = System.Text.Encoding.UTF8.GetString(resultBytes);
 
-            // TODO Comprobar que el archivo es de tipo audiodescripción en el interior
-            //Comprobar que no haya un duplicado
+            //TODO Comprobar que el archivo es de tipo audiodescripción en el interior
+            //TODO Comprobar que no sea duplicado
 
             /*if(audioDescriptionText.Length < 50)
             {
@@ -222,13 +256,14 @@ namespace proyecto_core.Controllers
 
             };
 
-            // Añade el contenido nuevo
+            //Añade el contenido nuevo
             _context.Content.Add(applicationUser);
             await _context.SaveChangesAsync();
-            // Redirige a la página del contenido
+            //Redirige a la página del contenido
             return RedirectToAction($"Details/{applicationUser.Id}");
         }
 
+        //
         // GET: Content/Edit/:id
         [Authorize]
         public ActionResult Edit(string id)
@@ -244,6 +279,7 @@ namespace proyecto_core.Controllers
                 return RedirectToAction("Index");
             }
 
+            //Devuelve el contenido en función de la id
             var applicationContent =
                 (from _content in _context.Content
                  where _content.Id == guid
@@ -265,6 +301,7 @@ namespace proyecto_core.Controllers
             return View(model);
         }
 
+        //
         // POST: Content/Edit
         [Authorize]
         [HttpPost]
@@ -275,20 +312,22 @@ namespace proyecto_core.Controllers
             {
                 return View(model);
             }
-
+            //Devuelve el contenido en función de la id del modelo
             var applicationContent =
                 (from _content in _context.Content
                  where _content.Id == model.Id
                  select _content).FirstOrDefault();
-
+            //Se comprueba si el modelo existe
             if (applicationContent == null)
             {
                 return RedirectToAction("Index");
             }
-
+            //Se modifican las variables de la edición
             applicationContent.Title = model.Title;
             applicationContent.Description = model.Description;
             applicationContent.AudioDescription = model.Audiodescription;
+
+            //TODO Añadir registro de cambios
 
             _context.Update(applicationContent);
             await _context.SaveChangesAsync();
@@ -309,6 +348,7 @@ namespace proyecto_core.Controllers
             {
                 return RedirectToAction("Index");
             }
+            //Devuelve el contenido en función de la id
             var applicationContent =
                 (from _content in _context.Content
                  where _content.Id == guid
@@ -319,6 +359,8 @@ namespace proyecto_core.Controllers
                 return RedirectToAction("Index");
             }
 
+            //Elimina el contenido
+            //TODO En lugar de eliminarlo, ocultarlo en una papelera
             _context.Remove(applicationContent);
             await _context.SaveChangesAsync();
 
@@ -326,17 +368,17 @@ namespace proyecto_core.Controllers
         }
 
         #region utils
-
+        //Pasado un texto, elimina todo el contenido no ascii que contenga
         private string DeleteNonAscii(string text)
         {
             return Regex.Replace(text, @"[^\u0000-\u007F]+", string.Empty);
         }
-
+        //Devuelve al usuario actual
         private Task<ApplicationUser> GetCurrentUserAsync()
         {
             return _userManager.GetUserAsync(HttpContext.User);
         }
-
+        //Añade errores
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
@@ -344,7 +386,7 @@ namespace proyecto_core.Controllers
                 ModelState.AddModelError(string.Empty, error.Description);
             }
         }
-
+        //Añade un solo error simple
         private void AddError(String description)
         {
             AddErrors(IdentityResult.Failed(new IdentityError[] {
@@ -353,7 +395,8 @@ namespace proyecto_core.Controllers
                     }
             }));
         }
-
+        //Comprueba si los bytes corresponden 
+        //a un binario o si por el contrario son texto
         private bool IsFileBinary(byte[] bytes)
         {
             for (int i = 0; i < bytes.Length; i++)
@@ -361,13 +404,13 @@ namespace proyecto_core.Controllers
                     return true;
             return false;
         }
-
+        //Pasado un texto, devuelve un FileStream con el contenido de este
         private FileStreamResult GetFileFromText(String text)
         {
             MemoryStream ms = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(text));
             return File(ms, "application/octet-stream"); // or "application/x-rar-compressed"
         }
-
+        //Devuelve un array de bytes en función del stream
         public static byte[] ReadBytesFromStream(Stream input)
         {
             byte[] buffer = new byte[16 * 1024];

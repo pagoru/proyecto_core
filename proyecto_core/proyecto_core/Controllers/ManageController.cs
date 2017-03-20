@@ -38,6 +38,7 @@ namespace proyecto_core.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(ManageMessageId? message = null)
         {
+            //Asigna el text de error en función del mensaje de error proporcionado
             ViewData["StatusMessage"] =
                 message == ManageMessageId.ChangePasswordSuccess ? "Tu contraseña se ha cambiado con éxito."
                 : message == ManageMessageId.Error ? "Ha courrido un error inesperado."
@@ -52,7 +53,7 @@ namespace proyecto_core.Controllers
             var model = new IndexViewModel
             {
                 ApplicationUser = user,
-
+                //Devuelve si el usuario actual es administrador
                 IsAdmin = await _userManager.IsInRoleAsync(user, WebRoles.Admin),
                 
                 Logins = await _userManager.GetLoginsAsync(user),
@@ -191,7 +192,7 @@ namespace proyecto_core.Controllers
         }
 
         #region Helpers
-
+        //Añade errores al modelo actual
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
@@ -199,7 +200,7 @@ namespace proyecto_core.Controllers
                 ModelState.AddModelError(string.Empty, error.Description);
             }
         }
-
+        //Enumeración de los mensajes disponibles
         public enum ManageMessageId
         {
             AddLoginSuccess,
@@ -208,7 +209,7 @@ namespace proyecto_core.Controllers
             ChangeNameSuccess,
             Error
         }
-
+        //Devuelve al usuario actual
         private Task<ApplicationUser> GetCurrentUserAsync()
         {
             return _userManager.GetUserAsync(HttpContext.User);

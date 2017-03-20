@@ -41,7 +41,7 @@ namespace proyecto_core.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl = null)
         {
-            // Clear the existing external cookie to ensure a clean login process
+            // Limpia las cookies existentes del usuario para hacer un login limpio
             await HttpContext.Authentication.SignOutAsync(_externalCookieScheme);
 
             ViewData["ReturnUrl"] = returnUrl;
@@ -58,9 +58,9 @@ namespace proyecto_core.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+                // Para bloquear las cuentas por intentos de conexión, se debe cambiar lockoutOnFailure a true
+                var result = await _signInManager
+                    .PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation(1, "User logged in.");
@@ -74,8 +74,8 @@ namespace proyecto_core.Controllers
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 return View(model);
             }
-
-            // If we got this far, something failed, redisplay form
+            
+            // En caso de que el modelo tenga algún error, se le vuelve a enviar el formulario a l'usuario
             return View(model);
         }
 
@@ -101,7 +101,7 @@ namespace proyecto_core.Controllers
             {
                 var emailIsInUse = await _userManager.FindByEmailAsync(model.Email);
 
-                //Verificación de que el correo electrónico esta en uso y su error correspondiente
+                //Comprueba si el correo electrónico esta en uso
                 if (await IsEmailInUse(model.Email))
                 {
                     AddErrors(getEmailInUseResult());
@@ -128,8 +128,7 @@ namespace proyecto_core.Controllers
                 }
                 AddErrors(result);
             }
-
-            // If we got this far, something failed, redisplay form
+            
             return View(model);
         }
 
@@ -139,100 +138,15 @@ namespace proyecto_core.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            //Deshabilita la cookie de session
             await _signInManager.SignOutAsync();
             _logger.LogInformation(4, "User logged out.");
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
-        //
-        // POST: /Account/ExternalLogin
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public IActionResult ExternalLogin(string provider, string returnUrl = null)
-        {
-            // Request a redirect to the external login provider.
-            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { ReturnUrl = returnUrl });
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
-            return Challenge(properties, provider);
-        }
-
-        //
-        // GET: /Account/ExternalLoginCallback
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
-        {
-            if (remoteError != null)
-            {
-                ModelState.AddModelError(string.Empty, $"Error from external provider: {remoteError}");
-                return View(nameof(Login));
-            }
-            var info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
-            {
-                return RedirectToAction(nameof(Login));
-            }
-
-            // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
-            if (result.Succeeded)
-            {
-                _logger.LogInformation(5, "User logged in with {Name} provider.", info.LoginProvider);
-                return RedirectToLocal(returnUrl);
-            }
-            if (result.RequiresTwoFactor)
-            {
-                return RedirectToAction(nameof(SendCode), new { ReturnUrl = returnUrl });
-            }
-            if (result.IsLockedOut)
-            {
-                return View("Lockout");
-            }
-            else
-            {
-                // If the user does not have an account, then ask the user to create an account.
-                ViewData["ReturnUrl"] = returnUrl;
-                ViewData["LoginProvider"] = info.LoginProvider;
-                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email });
-            }
-        }
-
-        //
-        // POST: /Account/ExternalLoginConfirmation
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl = null)
-        {
-            if (ModelState.IsValid)
-            {
-                // Get the information about the user from the external login provider
-                var info = await _signInManager.GetExternalLoginInfoAsync();
-                if (info == null)
-                {
-                    return View("ExternalLoginFailure");
-                }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await _userManager.CreateAsync(user);
-                if (result.Succeeded)
-                {
-                    result = await _userManager.AddLoginAsync(user, info);
-                    if (result.Succeeded)
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        _logger.LogInformation(6, "User created an account using {Name} provider.", info.LoginProvider);
-                        return RedirectToLocal(returnUrl);
-                    }
-                }
-                AddErrors(result);
-            }
-
-            ViewData["ReturnUrl"] = returnUrl;
-            return View(model);
-        }
-
+        /**
+         * NO IMPLEMENTADO
+         **/
         // GET: /Account/ConfirmEmail
         [HttpGet]
         [AllowAnonymous]
@@ -251,7 +165,9 @@ namespace proyecto_core.Controllers
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
-        //
+        /**
+         * NO IMPLEMENTADO
+         **/
         // GET: /Account/ForgotPassword
         [HttpGet]
         [AllowAnonymous]
@@ -260,7 +176,9 @@ namespace proyecto_core.Controllers
             return View();
         }
 
-        //
+        /**
+         * NO IMPLEMENTADO
+         **/
         // POST: /Account/ForgotPassword
         [HttpPost]
         [AllowAnonymous]
@@ -289,7 +207,9 @@ namespace proyecto_core.Controllers
             return View(model);
         }
 
-        //
+        /**
+         * NO IMPLEMENTADO
+         **/
         // GET: /Account/ForgotPasswordConfirmation
         [HttpGet]
         [AllowAnonymous]
@@ -298,7 +218,9 @@ namespace proyecto_core.Controllers
             return View();
         }
 
-        //
+        /**
+         * NO IMPLEMENTADO
+         **/
         // GET: /Account/ResetPassword
         [HttpGet]
         [AllowAnonymous]
@@ -307,7 +229,9 @@ namespace proyecto_core.Controllers
             return code == null ? View("Error") : View();
         }
 
-        //
+        /**
+         * NO IMPLEMENTADO
+         **/
         // POST: /Account/ResetPassword
         [HttpPost]
         [AllowAnonymous]
@@ -333,7 +257,9 @@ namespace proyecto_core.Controllers
             return View();
         }
 
-        //
+        /**
+         * NO IMPLEMENTADO
+         **/
         // GET: /Account/ResetPasswordConfirmation
         [HttpGet]
         [AllowAnonymous]
@@ -342,7 +268,9 @@ namespace proyecto_core.Controllers
             return View();
         }
 
-        //
+        /**
+         * NO IMPLEMENTADO
+         **/
         // GET: /Account/SendCode
         [HttpGet]
         [AllowAnonymous]
@@ -358,7 +286,9 @@ namespace proyecto_core.Controllers
             return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
+        /**
+         * NO IMPLEMENTADO
+         **/
         // POST: /Account/SendCode
         [HttpPost]
         [AllowAnonymous]
@@ -389,7 +319,9 @@ namespace proyecto_core.Controllers
             return RedirectToAction(nameof(VerifyCode), new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
         }
 
-        //
+        /**
+         * NO IMPLEMENTADO
+         **/
         // GET: /Account/VerifyCode
         [HttpGet]
         [AllowAnonymous]
@@ -404,7 +336,9 @@ namespace proyecto_core.Controllers
             return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
+        /**
+         * NO IMPLEMENTADO
+         **/
         // POST: /Account/VerifyCode
         [HttpPost]
         [AllowAnonymous]
@@ -446,6 +380,7 @@ namespace proyecto_core.Controllers
 
         #region Helpers
 
+        //Añade un error al modelo actual
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
@@ -454,6 +389,7 @@ namespace proyecto_core.Controllers
             }
         }
 
+        //redirecciona a una ruta local
         private IActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
