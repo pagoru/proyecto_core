@@ -62,33 +62,40 @@ namespace proyecto_core.Controllers
             }
             var roleName = idParts[0];
             var userName = idParts[1];
+            Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>" + roleName + "-" + userName);
             if (roleName.Length == 0)
             {
                 AddError("Error");
                 return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
+            Debug.WriteLine("1");
             if (userName.Length == 0)
             {
                 AddError("Error");
                 return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             var user = _userManager.Users.FirstOrDefault(u => u.UserName == userName);
-            if(user == null)
+            Debug.WriteLine("2");
+            if (user == null)
             {
                 AddError("Error");
                 return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
             var role = _roleManager.Roles.FirstOrDefault(r => r.Name == roleName);
-            if(role == null)
+            Debug.WriteLine("3");
+            if (role == null)
             {
                 AddError("Error");
                 return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
-            if (!user.IsInRole(role))
+            Debug.WriteLine("4");
+            
+            if (!await _userManager.IsInRoleAsync(user, role.Name))
             {
                 AddError("Error");
                 return RedirectToAction(nameof(AdminController.Index), "Admin");
             }
+            Debug.WriteLine("5");
 
             await _userManager.RemoveFromRoleAsync(user, roleName);
             await CloseUserSession(userName);

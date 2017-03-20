@@ -19,6 +19,7 @@
     @if (@Model.IsAdmin)
     {
         <br />
+        <br />
         <a asp-controller="Home" asp-action="Edit/@ac.Id.ToString()" class="btn btn-warning">editar</a>
         <a asp-controller="Home" asp-action="Delete/@ac.Id.ToString()" class="btn btn-danger">eliminar</a>
     }

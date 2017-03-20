@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using proyecto_core.Consts;
+using proyecto_core.Models.HomeViewModels;
 
 namespace proyecto_core.Controllers
 {
@@ -68,7 +69,7 @@ namespace proyecto_core.Controllers
 
         // GET: Content/Download/:guid
         [Authorize]
-        public FileStreamResult Download(String id)
+        public FileStreamResult Download(string id)
         {
             var applicationContent =
                 (from _content in _context.Content
@@ -89,7 +90,7 @@ namespace proyecto_core.Controllers
         }
 
         // GET: Content/DownloadDemo/:guid
-        public FileStreamResult DownloadDemo(String id)
+        public FileStreamResult DownloadDemo(string id)
         {
             var applicationContent =
                 (from _content in _context.Content
@@ -112,7 +113,7 @@ namespace proyecto_core.Controllers
         }
 
         // GET: Content/Details/:guid
-        public async Task<ActionResult> Details(String id)
+        public async Task<ActionResult> Details(string id)
         {
             Guid guid;
             try
@@ -223,59 +224,105 @@ namespace proyecto_core.Controllers
 
             // Añade el contenido nuevo
             _context.Content.Add(applicationUser);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             // Redirige a la página del contenido
             return RedirectToAction($"Details/{applicationUser.Id}");
         }
 
         // GET: Content/Edit/:id
         [Authorize]
-        public ActionResult Edit(String id)
+        public ActionResult Edit(string id)
         {
-            return View();
-        }
-
-        // POST: Content/Edit/:id
-        [Authorize]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
+            Guid guid;
             try
             {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
+                guid = Guid.Parse(id);
             }
             catch
             {
-                return View();
+                //TODO Controlar error
+                return RedirectToAction("Index");
             }
+
+            var applicationContent =
+                (from _content in _context.Content
+                 where _content.Id == guid
+                 select _content).FirstOrDefault();
+
+            if (applicationContent == null)
+            {
+                //TODO Controlar error
+                return RedirectToAction("Index");
+            }
+
+            var model = new EditViewModel()
+            {
+                Id = applicationContent.Id,
+                Title = applicationContent.Title,
+                Description = applicationContent.Description,
+                Audiodescription = applicationContent.AudioDescription
+            };
+            return View(model);
+        }
+
+        // POST: Content/Edit
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit(EditViewModel model)
+        {
+            if(!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var applicationContent =
+                (from _content in _context.Content
+                 where _content.Id == model.Id
+                 select _content).FirstOrDefault();
+
+            if (applicationContent == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            applicationContent.Title = model.Title;
+            applicationContent.Description = model.Description;
+            applicationContent.AudioDescription = model.Audiodescription;
+
+            _context.Update(applicationContent);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction($"Details/{model.Id}");
         }
 
         // GET: Content/Delete/:id
         [Authorize]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(string id)
         {
-            return View();
-        }
-
-        // POST: Content/Delete/:id
-        [Authorize]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
+            Guid guid;
             try
             {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
+                guid = Guid.Parse(id);
             }
             catch
             {
-                return View();
+                return RedirectToAction("Index");
             }
+            var applicationContent =
+                (from _content in _context.Content
+                 where _content.Id == guid
+                 select _content).FirstOrDefault();
+            
+            if(applicationContent == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            _context.Remove(applicationContent);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
 
         #region utils

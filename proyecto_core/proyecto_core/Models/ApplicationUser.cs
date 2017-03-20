@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using proyecto_core.Models.ContentViewModels;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace proyecto_core.Models
@@ -23,11 +24,6 @@ namespace proyecto_core.Models
                 return at_username;
 
             return Name;
-        }
-
-        public bool IsInRole(IdentityRole role)
-        {
-            return Roles.FirstOrDefault(r => r.RoleId == role.Id) != null;
         }
 
     }

@@ -1,6 +1,41 @@
+@using proyecto_core.Models.HomeViewModels
+@model EditViewModel
 @{
     ViewData["Title"] = "Edit";
 }
 
-<h2>Edit</h2>
+<h2>@ViewData["Title"]</h2>
+<h4>Editar audiodescripción</h4>
+<hr />
 
+<form asp-controller="Home" asp-action="Edit" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" enctype="multipart/form-data">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <input asp-for="Id" type="hidden" value="@Model.Id"/>
+    <div class="form-group">
+        <label asp-for="Title" class="col-md-4 control-label"></label>
+        <div class="col-md-8">
+            <input asp-for="Title" class="form-control" value="@Model.Title" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="Description" class="col-md-4 control-label"></label>
+        <div class="col-md-8">
+            <input asp-for="Description" class="form-control" value="@Model.Description" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="Audiodescription" class="col-md-4 control-label"></label>
+        <div class="col-md-8">
+            <textarea asp-for="Audiodescription" class="form-control" rows="5" value="@Model.Audiodescription" ></textarea>
+            <span asp-validation-for="Audiodescription" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-4 col-md-8">
+            <a asp-controller="home" asp-action="Index" class="btn btn-default">Volver</a>
+            <button type="submit" class="btn btn-warning">Editar</button>
+        </div>
+    </div>
+</form>

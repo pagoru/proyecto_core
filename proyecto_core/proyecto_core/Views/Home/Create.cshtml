@@ -4,10 +4,10 @@
     ViewData["Title"] = "Añadir contenido";
 }
 <h2>@ViewData["Title"]</h2>
-<h4>Crear nueva audiodescripción</h4>
+<h4>Añadir nueva audiodescripción</h4>
 <hr />
 
-<form asp-controller="Content" asp-action="Create" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal"  enctype="multipart/form-data">
+<form asp-controller="Home" asp-action="Create" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal"  enctype="multipart/form-data">
     <div asp-validation-summary="All" class="text-danger"></div>
     <div class="form-group">
         <label asp-for="Title" class="col-md-4 control-label"></label>
@@ -32,7 +32,7 @@
     </div>
     <div class="form-group">
         <div class="col-md-offset-4 col-md-6">
-            <button type="submit" class="btn btn-default">Crear</button>
+            <button type="submit" class="btn btn-success">Añadir</button>
         </div>
     </div>
 </form>
